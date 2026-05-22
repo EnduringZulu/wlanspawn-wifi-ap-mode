@@ -116,6 +116,17 @@ class TestHostapdBackend:
         content = conf.read_text()
         assert "ignore_broadcast_ssid=1" in content
 
+    def test_write_hostapd_conf_strong_encryption(self, tmp_path):
+        from wlanspawn.backends.hostapd import _write_hostapd_conf
+        conf = tmp_path / "hostapd.conf"
+        _write_hostapd_conf(conf, "wlan1", "TestNet", "password1", 6, "2.4GHz", False)
+        content = conf.read_text()
+        # Ensure WPA2 with AES/CCMP (not weak TKIP)
+        assert "wpa=2" in content  # WPA2 only
+        assert "wpa_pairwise=CCMP" in content  # AES encryption
+        assert "rsn_pairwise=CCMP" in content  # WPA2-AES
+        assert "TKIP" not in content  # No weak TKIP encryption
+
     def test_write_dnsmasq_conf_contents(self, tmp_path):
         from wlanspawn.backends.hostapd import _write_dnsmasq_conf
         conf = tmp_path / "dnsmasq.conf"

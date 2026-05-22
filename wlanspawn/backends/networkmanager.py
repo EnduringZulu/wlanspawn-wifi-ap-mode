@@ -65,11 +65,14 @@ class NetworkManagerBackend(HotspotBackend):
             "mode", "ap",
         ])
 
-        # --- Configure security ---
+        # --- Configure security (WPA2-AES for iOS compatibility) ---
         run([
             "nmcli", "connection", "modify", CONNECTION_NAME,
             "802-11-wireless-security.key-mgmt", "wpa-psk",
             "802-11-wireless-security.psk", password,
+            "802-11-wireless-security.proto", "rsn",  # WPA2 only
+            "802-11-wireless-security.pairwise", "ccmp",  # AES encryption
+            "802-11-wireless-security.group", "ccmp",  # AES for group
         ])
 
         # --- Configure radio ---

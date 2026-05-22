@@ -696,7 +696,10 @@ A: Many work great! Look for adapters with "AP mode support" in specs. Avoid ver
 ### Security
 
 **Q: Is the hotspot secure?**  
-A: Yes. wlanspawn enforces WPA2-PSK encryption. Open (no-password) hotspots are not supported by design.
+A: Yes. wlanspawn enforces **WPA2-PSK with AES (CCMP)** encryption - the strongest WPA2 configuration. Open (no-password) hotspots are not supported by design.
+
+**Q: Will iOS show "Weak Security" warning?**  
+A: **No!** As of the latest version, wlanspawn uses WPA2-AES (CCMP) encryption, which meets iOS/macOS security requirements. The old TKIP encryption (which triggered the warning) has been removed.
 
 **Q: Where is my password stored?**  
 A: In `~/.config/wlanspawn/config.toml` as plaintext. Protect it:
@@ -1318,10 +1321,32 @@ If you're still stuck:
 - The config file (`~/.config/wlanspawn/config.toml`) stores your Wi-Fi **password in plaintext**
   — ensure appropriate file permissions (`chmod 600`)
 - wlanspawn does **not** send any data to external servers
-- WPA2-PSK is enforced; open (no-password) hotspots are not supported by design
+- **WPA2-PSK with AES (CCMP)** encryption is enforced for maximum security
+  - No weak TKIP encryption (which triggers iOS "Weak Security" warnings)
+  - Compatible with all modern devices (2010+)
+  - Meets iOS/macOS security requirements
+- Open (no-password) hotspots are not supported by design
 - For production/shared use, consider MAC allowlisting (v0.3.0 roadmap)
 
-To protect your config file:
+### Encryption Details
+
+wlanspawn uses the strongest available WPA2 configuration:
+
+```
+WPA2-PSK (WPA2 Personal)
+Encryption: AES/CCMP (not TKIP)
+Key Management: WPA-PSK
+IEEE 802.11n/ac enabled
+```
+
+This configuration:
+- ✅ No "Weak Security" warnings on iOS/macOS
+- ✅ Compatible with all devices since ~2010
+- ✅ Meets modern security standards
+- ✅ Resistant to known WPA2 attacks (with strong password)
+
+### Protect Your Config File
+
 ```bash
 chmod 600 ~/.config/wlanspawn/config.toml
 ```
