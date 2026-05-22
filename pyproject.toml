@@ -1,0 +1,88 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# ---------------------------------------------------------------------------
+[project]
+name = "wlanspawn"
+version = "0.1.0"
+description = "Turn any Wi-Fi adapter into a hotspot in seconds"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "wlanspawn contributors" }]
+keywords = ["wifi", "hotspot", "access-point", "networking", "cli"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: System Administrators",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Networking",
+    "Topic :: Utilities",
+]
+requires-python = ">=3.9"
+
+dependencies = [
+    "click>=8.1",
+    "rich>=13.0",
+    "tomli>=2.0; python_version < '3.11'",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "ruff>=0.1",
+    "mypy>=1.0",
+    "types-toml",
+]
+
+[project.urls]
+Homepage       = "https://github.com/yourusername/wlanspawn"
+Repository     = "https://github.com/yourusername/wlanspawn"
+Documentation  = "https://github.com/yourusername/wlanspawn#readme"
+"Bug Tracker"  = "https://github.com/yourusername/wlanspawn/issues"
+Changelog      = "https://github.com/yourusername/wlanspawn/blob/main/CHANGELOG.md"
+
+[project.scripts]
+wlanspawn = "wlanspawn.cli:main"
+
+# ---------------------------------------------------------------------------
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["wlanspawn*"]
+
+# ---------------------------------------------------------------------------
+[tool.black]
+line-length = 100
+target-version = ["py39"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=wlanspawn --cov-report=term-missing -v"
+
+[tool.coverage.run]
+source = ["wlanspawn"]
+omit = ["tests/*"]

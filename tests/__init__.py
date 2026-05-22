@@ -1,0 +1,1 @@
+"""wlanspawn test suite."""

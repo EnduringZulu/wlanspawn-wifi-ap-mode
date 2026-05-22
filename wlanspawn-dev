@@ -1,0 +1,17 @@
+#!/bin/bash
+# Development wrapper for wlanspawn with sudo support
+# Usage: ./wlanspawn-dev up
+#        sudo ./wlanspawn-dev up
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VENV_PATH="$SCRIPT_DIR/.venv"
+
+# Activate virtual environment
+if [ -f "$VENV_PATH/bin/activate" ]; then
+    source "$VENV_PATH/bin/activate"
+    python3 -m wlanspawn.cli "$@"
+else
+    echo "Error: Virtual environment not found at $VENV_PATH"
+    echo "Run: python3 -m venv .venv && source .venv/bin/activate && pip install -e ."
+    exit 1
+fi

@@ -1,0 +1,31 @@
+# wlanspawn — example configuration
+# Copy to ~/.config/wlanspawn/config.toml or run `wlanspawn init`
+
+[hotspot]
+ssid     = "MyHotspot"
+password = "supersecret123"
+band     = "2.4GHz"    # "2.4GHz" or "5GHz"
+channel  = 6           # 2.4GHz: 1-11 | 5GHz: 36, 40, 44, 48, ...
+hidden   = false       # true = hidden SSID (devices must know the name)
+
+[interfaces]
+internet = "wlan0"     # Interface that has internet (check: ip route show default)
+ap       = "wlan1"     # Interface that will become the AP (must be different)
+
+[network]
+gateway          = "192.168.73.1"
+subnet           = "192.168.73.0/24"
+dhcp_range_start = "192.168.73.10"
+dhcp_range_end   = "192.168.73.100"
+dns              = "8.8.8.8,1.1.1.1"   # Comma-separated DNS servers
+
+[backend]
+# auto          = let wlanspawn pick the best backend for your system
+# networkmanager = use nmcli (recommended for Fedora/Ubuntu/Arch desktop)
+# hostapd       = use hostapd + dnsmasq (for servers / systems without NM)
+# windows       = use netsh (Windows 10/11)
+type = "auto"
+
+[logging]
+level = "INFO"    # DEBUG, INFO, WARNING, ERROR
+file  = "~/.local/share/wlanspawn/wlanspawn.log"
