@@ -235,15 +235,24 @@ curl -sSL https://raw.githubusercontent.com/yourusername/wlanspawn/main/scripts/
 After installation, verify everything works:
 
 ```bash
-# Check installation
+# Check installation (no sudo needed)
 wlanspawn --version
 
-# Run system check (no root needed)
+# Run system check (no sudo needed)
 wlanspawn doctor
 
-# Initialize configuration
+# Initialize configuration (needs sudo)
+# If installed from source, use the wrapper:
+sudo ./wlanspawn-dev init
+
+# Or use the Python module form:
+sudo python3 -m wlanspawn.cli init
+
+# If installed system-wide:
 sudo wlanspawn init
 ```
+
+**For development from source**: Use `sudo ./wlanspawn-dev <command>` - it automatically handles virtual environment activation with sudo.
 
 ---
 
@@ -271,16 +280,18 @@ cd wlanspawn
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e .
 
-# 3. Run the setup wizard
-sudo wlanspawn init
+# 3. Run the setup wizard (use the dev wrapper for sudo support)
+sudo ./wlanspawn-dev init
 # Follow the prompts to configure your hotspot
 
 # 4. Start the hotspot
-sudo wlanspawn up
+sudo ./wlanspawn-dev up
 
 # 5. Monitor connected clients
-sudo wlanspawn clients --watch
+sudo ./wlanspawn-dev clients --watch
 ```
+
+**Note:** The `wlanspawn-dev` wrapper handles virtual environment activation automatically with sudo. Alternatively, use `sudo python3 -m wlanspawn.cli <command>`.
 
 That's it! Your hotspot is now broadcasting.
 
@@ -295,6 +306,14 @@ That's it! Your hotspot is now broadcasting.
 Run the interactive setup wizard. Saves your config to `~/.config/wlanspawn/config.toml`.
 
 ```bash
+# If installed from source (development):
+sudo ./wlanspawn-dev init              # Start interactive wizard
+sudo ./wlanspawn-dev init --force      # Re-run even if config exists
+
+# Or using Python module:
+sudo python3 -m wlanspawn.cli init
+
+# If installed system-wide:
 sudo wlanspawn init                    # Start interactive wizard
 sudo wlanspawn init --force            # Re-run even if config exists
 ```
@@ -312,8 +331,14 @@ sudo wlanspawn init --force            # Re-run even if config exists
 Start the hotspot using your saved config.
 
 ```bash
+# From source (development):
+sudo ./wlanspawn-dev up                # Use saved config
+sudo ./wlanspawn-dev up --ssid "GuestNet" --password "temppass123"
+sudo ./wlanspawn-dev up --iface wlan1  # Override AP interface
+
+# System-wide install:
 sudo wlanspawn up                      # Use saved config
-sudo wlanspawn up --ssid "GuestNet" --password "temppass123"  # Override settings
+sudo wlanspawn up --ssid "GuestNet" --password "temppass123"
 sudo wlanspawn up --iface wlan1        # Override AP interface
 ```
 
@@ -332,6 +357,10 @@ sudo wlanspawn up --iface wlan1        # Override AP interface
 Stop the hotspot and clean up.
 
 ```bash
+# From source:
+sudo ./wlanspawn-dev down
+
+# System-wide:
 sudo wlanspawn down
 ```
 
@@ -348,6 +377,11 @@ sudo wlanspawn down
 Show current hotspot configuration and running state.
 
 ```bash
+# From source:
+sudo ./wlanspawn-dev status            # Human-readable table
+sudo ./wlanspawn-dev status --json     # Machine-readable output
+
+# System-wide:
 sudo wlanspawn status                  # Human-readable table
 sudo wlanspawn status --json           # Machine-readable output
 ```
@@ -374,8 +408,14 @@ Hotspot Status
 List connected devices with IP, hostname, signal strength, and traffic.
 
 ```bash
+# From source:
+sudo ./wlanspawn-dev clients           # Show once
+sudo ./wlanspawn-dev clients --watch   # Auto-refresh every 5s (Ctrl+C to stop)
+sudo ./wlanspawn-dev clients --json    # JSON output for scripts
+
+# System-wide:
 sudo wlanspawn clients                 # Show once
-sudo wlanspawn clients --watch         # Auto-refresh every 5s (Ctrl+C to stop)
+sudo wlanspawn clients --watch         # Auto-refresh every 5s
 sudo wlanspawn clients --json          # JSON output for scripts
 ```
 
@@ -426,30 +466,40 @@ wlanspawn config path                  # Print config file location
 #### Temporary guest network
 
 ```bash
-# Quick one-off hotspot without saving config
+# Quick one-off hotspot without saving config (from source)
+sudo ./wlanspawn-dev up --ssid "Guest-WiFi-2024" --password "temporary123" --iface wlan1
+
+# System-wide install:
 sudo wlanspawn up --ssid "Guest-WiFi-2024" --password "temporary123" --iface wlan1
 ```
 
 #### Monitor clients in real-time
 
 ```bash
-# Watch mode with auto-refresh
+# Watch mode with auto-refresh (from source)
+sudo ./wlanspawn-dev clients --watch
+
+# System-wide:
 sudo wlanspawn clients --watch
 ```
 
 #### Scripting / automation
 
 ```bash
+# From source (development):
 # Get client count for monitoring
-CLIENT_COUNT=$(sudo wlanspawn clients --json | jq '. | length')
+CLIENT_COUNT=$(sudo ./wlanspawn-dev clients --json | jq '. | length')
 echo "Connected clients: $CLIENT_COUNT"
 
 # Check if hotspot is running
-if sudo wlanspawn status --json | jq -e '.running == true' > /dev/null; then
+if sudo ./wlanspawn-dev status --json | jq -e '.running == true' > /dev/null; then
     echo "Hotspot is active"
 else
     echo "Hotspot is down"
 fi
+
+# System-wide install (same commands without ./wlanspawn-dev):
+CLIENT_COUNT=$(sudo wlanspawn clients --json | jq '. | length')
 ```
 
 #### Using a custom config file
